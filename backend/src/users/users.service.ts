@@ -53,7 +53,6 @@ export class UsersService {
     console.log(user);
 
     if (!user) {
-
       user = this.entityManager.create(User, {
         usersemail: email,
         usersname: name,
@@ -63,6 +62,7 @@ export class UsersService {
         usersgender: '',
         userscreated: new Date(),
         usersaddress: '',
+        userschange: false,
         usersphone: '',
         usersnation: '',
         userstwoverify: false,
@@ -91,6 +91,7 @@ export class UsersService {
         usersgender: '',
         userscreated: new Date(),
         usersaddress: '',
+        userschange: false,
         usersphone: '',
         usersnation: '',
         userstwoverify: false,
@@ -122,7 +123,7 @@ export class UsersService {
     return hashedPassword;
   }
 
-  async registerUser(email: string, password: string, confirm: string): Promise<any>{
+  async registerUser(email: string, password: string, confirm: string): Promise<any> {
     const user = await this.entityManager.findOne(User, { where: { usersemail: email } });
     const admin = await this.entityManager.findOne(Admin, { where: { adminsemail: email } });
     if (user || admin) {
@@ -139,6 +140,7 @@ export class UsersService {
           usersgender: '',
           userscreated: new Date(),
           usersaddress: '',
+          userschange: true,
           usersphone: '',
           usersnation: '',
           userstwoverify: false,
@@ -150,6 +152,111 @@ export class UsersService {
       } else {
         return { success: false, message: 'Account already exists' }
       }
+    }
+  }
+
+  async updateName(email: string, name: string) {
+    const users = await this.entityManager.findOne(User, { where: { usersemail: email } });
+    if (users) {
+      await this.entityManager.update(User, users.usersemail, {
+        usersname: name
+      });
+      return { success: true, message: 'Full Name updated successfully' };
+    } else {
+      return { fail: true, message: 'User not found' };
+    }
+  }
+
+  async updateGender(email: string, gender: string) {
+    const users = await this.entityManager.findOne(User, { where: { usersemail: email } });
+    if (users) {
+      await this.entityManager.update(User, users.usersemail, {
+        usersgender: gender
+      });
+      return { success: true, message: 'Gender updated successfully' };
+    } else {
+      return { fail: true, message: 'User not found' };
+    }
+  }
+
+  async updatePhone(email: string, phone: string) {
+    const users = await this.entityManager.findOne(User, { where: { usersemail: email } });
+    if (users) {
+      await this.entityManager.update(User, users.usersemail, {
+        usersphone: phone
+      });
+      return { success: true, message: 'Phone updated successfully' }
+    } else {
+      return { fail: true, message: 'User not found' };
+    }
+  }
+
+  async updateBirthday(email: string, birthday: Date) {
+    const users = await this.entityManager.findOne(User, { where: { usersemail: email } });
+    if (users) {
+      await this.entityManager.update(User, users.usersemail, {
+        usersbirthday: birthday
+      });
+      return { success: true, message: 'Birthday updated successfully' }
+    } else {
+      return { fail: true, message: 'User not found' };
+    }
+  }
+
+  async updateCountry(email: string, country: string) {
+    const users = await this.entityManager.findOne(User, { where: { usersemail: email } });
+    if (users) {
+      await this.entityManager.update(User, users.usersemail, {
+        usersnation: country
+      });
+      return { success: true, message: 'Country updated successfully' }
+    } else {
+      return { fail: true, message: 'User not found' };
+    }
+  }
+
+  async updateAvatar(email: string, avatar: string) {
+    const users = await this.entityManager.findOne(User, { where: { usersemail: email } });
+    if (users) {
+      await this.entityManager.update(User, users.usersemail, {
+        userspath: avatar
+      });
+      return { success: true, message: 'Avatar updated successfully' }
+    } else {
+      return { fail: true, message: 'User not found' };
+    }
+  }
+
+  async updatePassword(email: string, password: string): Promise<any> {
+    const users = await this.entityManager.findOne(User, { where: { usersemail: email } });
+    if (users) {
+      if (users.userschange) {
+        const hashPass = await this.hashPassword(password);
+        await this.entityManager.update(User, users.usersemail, {
+          userspass: hashPass,
+        });
+      } else {
+        const hashPass = await this.hashPassword(password);
+        await this.entityManager.update(User, users.usersemail, {
+          userspass: hashPass,
+          userschange: true
+        });
+      }
+      return { success: true, message: 'Password updated successfully' }
+    } else {
+      return { fail: true, message: 'User not found' };
+    }
+  }
+
+  async updateStep(email: string, userstwoverify: boolean){
+    const users = await this.entityManager.findOne(User, { where: { usersemail: email } });
+    if (users) {
+      await this.entityManager.update(User, users.usersemail, {
+        userstwoverify: userstwoverify
+      });
+      return { success: true, message: 'Verification updated successfully' }
+    } else {
+      return { fail: true, message: 'User not found' };
     }
   }
 

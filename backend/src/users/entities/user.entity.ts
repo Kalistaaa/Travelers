@@ -33,6 +33,9 @@ export class User {
     userspath: string;
 
     @Column('boolean')
+    userschange: boolean;
+
+    @Column('boolean')
     usersisactive: boolean;
 
     @Column('boolean')
